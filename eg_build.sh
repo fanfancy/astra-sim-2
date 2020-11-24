@@ -1,0 +1,1 @@
+./build/astra_garnet/build.sh -c

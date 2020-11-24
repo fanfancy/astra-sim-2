@@ -1,0 +1,1 @@
+examples/run_allreduce.sh -n garnet
