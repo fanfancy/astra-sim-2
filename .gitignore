@@ -33,3 +33,10 @@ examples/results/
 # big
 gem5.opt
 
+# output 
+m5out/stats.txt
+
+# gen workload
+extern/compute/SCALE-Sim/outputs/*
+scripts/workload_generator/outputs/*
+scripts/workload_generator/workload.txt

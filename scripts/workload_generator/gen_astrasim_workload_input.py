@@ -15,8 +15,8 @@ NumberOfChannels        = 1
 # End common variables for all layers
 
 # Region for constants
-SCALESIM_PATH = r"../../compute/SCALE-Sim"
-SCALESIM_CONFIG = r"../../compute/SCALE-Sim/configs/google.cfg"
+SCALESIM_PATH = r"../../extern/compute/SCALE-Sim"
+SCALESIM_CONFIG = r"../../extern/compute/SCALE-Sim/configs/google.cfg"
 OUTPUT_FILE_NAME = r"workload.txt"
 
 Hybrid                  = "HYBRID"
