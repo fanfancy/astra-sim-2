@@ -48,13 +48,15 @@ def run_net( ifmap_sram_size=1,
 
     first = True
     
+    print ("param_file",param_file)
     for row in param_file:
+        print ("reading param_file!")
         if first:
             first = False
             continue
-            
+        
         elems = row.strip().split(',')
-        #print(len(elems))
+        print("len(elems)",len(elems))
         
         # Do not continue if incomplete line
         if len(elems) < 9:

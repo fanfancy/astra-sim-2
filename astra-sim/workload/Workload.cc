@@ -57,7 +57,7 @@ Workload::Workload(
   this->run_name = run_name;
   this->registered_for_finished_streams = false;
   if (generator->id == 0 && seprate_log) {
-    std::cout << "stat path: " << path << " ,total rows: " << total_rows
+    std::cout << "stat path: " << path << " ,total rows: " << total_rows // cout ed
               << " ,stat row: " << stat_row << std::endl;
     detailed = new CSVWriter(path, "detailed.csv");
     end_to_end = new CSVWriter(path, "EndToEnd.csv");
@@ -73,6 +73,7 @@ void Workload::initialize_stat_files() {
   end_to_end->initialize_csv(SIZE * total_rows + 20, 50);
 }
 void Workload::call(EventType event, CallData* data) {
+  std::cout<<"add by fanxi Workload::call!" <<std::endl;
   if (counter > 0) {
     generator->try_register_event(
         this, EventType::Workload_Wait, NULL, counter);
@@ -169,10 +170,13 @@ void Workload::iterate_micro_benchmark() {
   check_for_sim_end();
 }
 void Workload::iterate_data_parallel() {
+  std::cout <<std::endl <<"add by fanxi Workload: "<<index<<"Workload:：iterate_data_parallel!" <<std::endl;
   assert(index >= 0);
   assert(index < SIZE);
   check_for_sim_end();
   if (current_state == LoopState::Forward_Pass) {
+    std::cout<<"add by fanxi layer: "<<index<<" forwarding!" <<std::endl;
+    std::cout<<"generator->id 179: " << generator->id << std::endl;
     if (!layers[index]->is_weight_grad_comm_finished_blocking()) {
       // layers[index]->increment_waiting_for_wg();
       // waiting_for_comm++;
@@ -181,6 +185,7 @@ void Workload::iterate_data_parallel() {
     }
     if (delay_loaded == false) {
       counter = layers[index]->get_fwd_pass_compute();
+      std::cout<<"generator->id 188 : "  << generator->id << std::endl;
       if (generator->id == 0) {
         // std::cout<<"layer: "<<index<<" delay in cycles:
         // "<<counter<<std::endl;
@@ -188,14 +193,16 @@ void Workload::iterate_data_parallel() {
       delay_loaded = true;
     }
     if (counter > 0) {
+      std::cout<<"generator->id 196 " << generator->id << std::endl;
       if (generator->id == 0) {
         // std::cout<<"i have been called in cycles:
         // "<<Sys::boostedTick()<<std::endl;
       }
       generator->try_register_event(
           this, EventType::Workload_Wait, NULL, counter);
-      return;
+      return;   // skip out :(current_state == LoopState::Forward_Pass)
     }
+    std::cout<<"generator->id 205 " << generator->id << std::endl;
     if (generator->id == 0) {
       // std::cout<<"moving to the fwp layer:"<<index<<" ,at time:
       // "<<Sys::boostedTick()<<std::endl;
@@ -208,12 +215,16 @@ void Workload::iterate_data_parallel() {
     }
     generator->register_event(this, EventType::General, NULL, 1);
     return;
+
+    
   } else if (current_state == LoopState::Weight_Gradient) {
+    std::cout<< std::endl << "add by fanxi layer: "<<index<<" Weight_Gradient !" <<std::endl;
     if (delay_loaded == false) {
       counter = layers[index]->get_weight_grad_compute();
       delay_loaded = true;
     }
     if (counter > 0) {
+      std::cout<<"counter > 0 @ 229"<<std::endl;
       generator->try_register_event(
           this, EventType::Workload_Wait, NULL, counter);
       return;
@@ -226,19 +237,27 @@ void Workload::iterate_data_parallel() {
         SchedulingPolicy::None,
         CollectiveBarrier::Non_Blocking);
     if (index == 0) {
+      std::cout<<"index == 0 @ 242"<<std::endl;
       if (generator->id == 0) {
         std::cout << "pass: " << pass_counter
                   << " finished at time: " << Sys::boostedTick() << std::endl;
       }
       pass_counter++;
       current_state = LoopState::Forward_Pass;
+      std::cout<<"current_state = Forward_Pass  @250"<<std::endl;
     } else {
       current_state = LoopState::Input_Gradient;
+      std::cout<<"current_state = Input_Gradient @253"<<std::endl;
     }
     generator->register_event(this, EventType::General, NULL, 1);
     return;
+
+
+
   } else if (current_state == LoopState::Input_Gradient) {
+    std::cout  <<std::endl <<"add by fanxi layer: "<<index<<" Input_Gradient !" <<std::endl;
     if (delay_loaded == false) {
+      std::cout<<"delay_loaded = false @263"<<std::endl;
       counter = layers[index]->get_input_grad_compute();
       delay_loaded = true;
     }
@@ -1312,7 +1331,7 @@ bool Workload::initialize_workload(std::string name) {
               << std::endl;
     return false;
   } else {
-    std::cout << "success in openning file" << std::endl;
+    std::cout << "in workload.cc success in openning file" << name << std::endl;
   }
   std::string type;
   int lines;
@@ -1359,7 +1378,8 @@ bool Workload::initialize_workload(std::string name) {
   }
   inFile >> lines;
   run_type = type;
-  SIZE = lines;
+  SIZE = lines; // the number of layers
+
   layers = new Layer*[SIZE];
   for (int i = 0; i < lines; i++) {
     std::string id;
@@ -1474,6 +1494,7 @@ bool Workload::initialize_workload(std::string name) {
   return true;
 }
 void Workload::fire() {
+  std::cout<<"add by fanxi Workload::fire!" <<std::endl;
   call(EventType::General, NULL);
 }
 } // namespace AstraSim

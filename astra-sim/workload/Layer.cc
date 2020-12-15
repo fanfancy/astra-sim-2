@@ -87,7 +87,7 @@ void Layer::call(EventType event, CallData* mdata) {
   }
   int data = ((IntData*)mdata)->data;
   IntData* intData = ((IntData*)mdata);
-  if (event == EventType::Wight_Grad_Comm_Finished_After_Delay) {
+  if (event == EventType::Wight_Grad_Comm_Finished_After_Delay) {  //entered
     if (generator->id == 0) {
       std::cout << "***** info: weight gradient collective for layer: " << id
                 << " is finished************" << std::endl;
@@ -96,8 +96,10 @@ void Layer::call(EventType event, CallData* mdata) {
         weight_grad_datasets[data]->creation_tick;
     if (weight_grad_datasets.size() == 1 &&
         wg_barrier == CollectiveBarrier::Blocking) {
+      std::cout << "add by fanxi total_waiting_for_wg_comm @line99:" << total_waiting_for_wg_comm  << std::endl;
       total_waiting_for_wg_comm += weight_grad_datasets[data]->finish_tick -
           weight_grad_datasets[data]->creation_tick;
+      std::cout << "add by fanxi total_waiting_for_wg_comm @line101:" << total_waiting_for_wg_comm  << std::endl;
       update_stream_stats(weight_grad_datasets[data]);
       int dataset_streams = weight_grad_datasets[data]->total_streams;
       delete weight_grad_datasets[data];
@@ -107,8 +109,10 @@ void Layer::call(EventType event, CallData* mdata) {
       delete intData;
       return;
     } else if (started_waiting_for_weight_grad.size() > 0) {
+      std::cout << "add by fanxi total_waiting_for_wg_comm @line112:" << total_waiting_for_wg_comm  << std::endl;
       total_waiting_for_wg_comm += weight_grad_datasets[data]->finish_tick -
           started_waiting_for_weight_grad.front();
+      std::cout << "add by fanxi total_waiting_for_wg_comm @line115:" << total_waiting_for_wg_comm  << std::endl;
       started_waiting_for_weight_grad.pop_front();
       update_stream_stats(weight_grad_datasets[data]);
       int dataset_streams = weight_grad_datasets[data]->total_streams;
@@ -224,7 +228,9 @@ Tick Layer::get_weight_grad_compute() {
   return weight_grad_compute_time;
 }
 void Layer::increment_waiting_for_wg() {
+  std::cout << "add by fanxi total_waiting_for_wg_comm @line231:" << total_waiting_for_wg_comm  << std::endl;
   total_waiting_for_wg_comm++;
+  std::cout << "add by fanxi total_waiting_for_wg_comm @line233:" << total_waiting_for_wg_comm  << std::endl;
 }
 void Layer::increment_waiting_for_ig() {
   total_waiting_for_ig_comm++;
@@ -275,7 +281,7 @@ bool Layer::is_weight_grad_comm_finished_blocking() {
   this->started_waiting_for_weight_grad.push_back(Sys::boostedTick());
   return false;
 }
-LayerData Layer::report(
+LayerData Layer::report(   // class LayerData is defined in AstraSimDataAPI.hh
     std::string run_name,
     int layer_num,
     int total_rows,

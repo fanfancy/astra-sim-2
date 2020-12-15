@@ -1,1 +1,1 @@
-examples/run_allreduce.sh -n garnet
+examples/run_mlp1_datapara.sh -n garnet

@@ -32,31 +32,48 @@ class Torus3D(SimpleTopology):
     description='Torus'
 
     def __init__(self, controllers):
+        print ("fanxi  added")
+        print ("This is in file garnet/gem5_astra/configs/topologies/torus3d.py")
         self.nodes = controllers
 
     # Makes a generic mesh
     # assuming an equal number of cache and directory cntrls
 
     def makeTopology(self, options, network, IntLink, ExtLink, Router):
+        print ("fanxi added in torus3D.py")
+        print ("options",options)
+
         nodes = self.nodes
 
         num_routers = options.num_cpus
         num_rows = options.num_packages
+        
 
         num_global_rows = options.package_rows
         num_global_cols = int(options.num_packages/num_global_rows)
         num_local_cols = int(options.num_cpus/options.num_packages)
 
+        # local dimension only has the num_local_cols 
+
+        print ("fanxi  added")
+        print ("num_rows = ",num_rows)
+        print ("num_global_rows = ",num_global_rows)
+        print ("num_global_cols = ",num_global_cols)
+        print ("num_local_cols = ", num_local_cols)
+
+
         local_vnets = range(0,options.local_rings)
         print "local vnets:" + str(local_vnets)
         vertical_vnets_1 = range(options.local_rings,options.local_rings+options.vertical_rings)
         vertical_vnets_2 = range(options.local_rings+options.vertical_rings,options.local_rings+2*options.vertical_rings)
-        #print "vertical vnets1:" + str(vertical_vnets_1)
+        print "vertical vnets1:" + str(vertical_vnets_1)
+        print "vertical vnets2:" + str(vertical_vnets_2)
         horizontal_vnets_1 = range(options.local_rings+2*options.vertical_rings,options.local_rings+2*options.vertical_rings+options.horizontal_rings)
         horizontal_vnets_2 = range(options.local_rings+2*options.vertical_rings+options.horizontal_rings,options.local_rings+2*options.vertical_rings+2*options.horizontal_rings)
-        #print "horizontal vnets1:" + str(horizontal_vnets_1)
+        print "horizontal vnets1:" + str(horizontal_vnets_1)
+        print "horizontal vnets2:" + str(horizontal_vnets_2)
         all_vnets = range(0,options.local_rings+2*options.vertical_rings+2*options.horizontal_rings)
-        print "all vnets:" + str(all_vnets)
+        print "all vnets:" + str(all_vnets)  # the number of rings?
 
         flit_width = options.flit_width
         tile_link_width = options.tile_link_width
@@ -98,13 +115,28 @@ class Torus3D(SimpleTopology):
             else:
                 remainder_nodes.append(nodes[node_index])
 
+        print ("add by fanxi")
+        print ("network_nodes",network_nodes)  # outputs: ('network_nodes', [
+        # <m5.objects.L1Cache_Controller.L1Cache_Controller object at 0x7f434c904c90>, 
+        # <m5.objects.L1Cache_Controller.L1Cache_Controller object at 0x7f434c90e3d0>, 
+        # <m5.objects.L1Cache_Controller.L1Cache_Controller object at 0x7f434c90ead0>, 
+        # <m5.objects.L1Cache_Controller.L1Cache_Controller object at 0x7f434c91e210>, 
+        # <m5.objects.Directory_Controller.Directory_Controller object at 0x7f434c91e790>, 
+        # <m5.objects.Directory_Controller.Directory_Controller object at 0x7f434c91e950>, 
+        # <m5.objects.Directory_Controller.Directory_Controller object at 0x7f434c91eb10>, 
+        # <m5.objects.Directory_Controller.Directory_Controller object at 0x7f434c91ecd0>])
+
+        print ("remainder_nodes",remainder_nodes)
+
         # Connect each node to the appropriate router
         ext_links = []
+        print (" for (i, n) in enumerate(network_nodes):")
         for (i, n) in enumerate(network_nodes):
             cntrl_level, router_id = divmod(i, num_routers)
             routers[router_id].width = flit_width
             assert(cntrl_level < cntrls_per_router)
             for j in all_vnets:
+                print ("router id = ", router_id, "\tsupported_vnets = ", j)
                 ext_links.append(ExtLink(link_id=link_count, ext_node=n,
                                 int_node=routers[router_id],
                                 supported_vnets = [j],
@@ -112,9 +144,14 @@ class Torus3D(SimpleTopology):
                                 width = flit_width
                                 ))
                 link_count += 1
+        print ("number of the ext_links",len(ext_links))
+        # ExtLink: from the router to network interface
 
         # Connect the remainding nodes to router 0.  These should only be
         # DMA nodes.
+        print ("number of the ext_links",len(ext_links))
+
+        print ("remainder_nodes",remainder_nodes)
         for (i, node) in enumerate(remainder_nodes):
             assert(node.type == 'DMA_Controller')
             assert(i < remainder)
@@ -131,6 +168,7 @@ class Torus3D(SimpleTopology):
         int_links = []
 
         #East output to West input links (weight = 1)
+        print ("in the loop1")
         for row in xrange(num_rows):
             for col in xrange(num_columns):
                 if (col + 1 <= num_columns and num_columns > 1):
@@ -150,7 +188,9 @@ class Torus3D(SimpleTopology):
                                              weight=1,
                                              supported_vnets = [j]))
                         link_count += 1
-
+        
+        
+        print ("in the loop2")
         for local in xrange(num_local_cols):
             for row in xrange(num_global_rows):
                 for col in xrange(num_global_cols):
@@ -171,6 +211,8 @@ class Torus3D(SimpleTopology):
                                              weight=1,
                                              supported_vnets = [j]))
                             link_count += 1
+
+        print ("in the loop3")
         for local in xrange(num_local_cols):
             for row in xrange(num_global_rows):
                 for col in xrange(num_global_cols):
@@ -191,7 +233,10 @@ class Torus3D(SimpleTopology):
                                              weight=1,
                                              supported_vnets = [j]))
                             link_count += 1
+        
         #North output to South input links (weight = 2)
+        
+        print ("in the loop4")
         for local in xrange(num_local_cols):
             for col in xrange(num_global_cols):
                 for row in xrange(num_global_rows):
@@ -214,6 +259,7 @@ class Torus3D(SimpleTopology):
                                              supported_vnets = [j]))
                             link_count += 1
 
+        print ("in the loop5")
         for local in xrange(num_local_cols):
             for col in xrange(num_global_cols):
                 for row in xrange(num_global_rows):

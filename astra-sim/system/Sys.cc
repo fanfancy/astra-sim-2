@@ -287,6 +287,9 @@ Sys::Sys(
   vLevels = new QueueLevels(levels, 0);
   logical_topologies["DBT"] = new DoubleBinaryTreeTopology(
       id, hor, id % loc, loc, loc); // horizontal_dim,id%local_dim,local_dim);
+  std::cout << "fanxi added in sys.cc:new Torus3D ing " << std::endl;
+  std::cout << "total_nodes = " << total_nodes << "  loc = "<<loc << " ver = " <<ver << std::endl;
+  
   logical_topologies["Torus3D"] = new Torus3D(id, total_nodes, loc, ver);
   logical_topologies["LocalRingNodeA2AGlobalDBT"] =
       new LocalRingNodeA2AGlobalDBT(id, ver, id % (hor * loc), hor * loc, 1);
@@ -330,6 +333,9 @@ Sys::Sys(
     Tick cycle = 1;
     try_register_event(this, EventType::NotInitialized, NULL, cycle);
     return;
+  }
+  else {
+    std::cout << "add for learn: sys.cc new a workload "  << std::endl;
   }
   this->initialized = true;
 }
@@ -2036,6 +2042,12 @@ void Sys::try_register_event(
     CallData* callData,
     Tick& cycles) {
   bool should_schedule = false;
+
+  // add by fanxi
+  // std::cout << std::endl << "try_register_event in sys.cc" << std::endl;
+  // std::cout << "Sys::boostedTick(): " << (Sys::boostedTick())<< std::endl;
+  // std::cout << "event registered: cycles " << cycles << std::endl;
+  
   if (event_queue.find(Sys::boostedTick() + cycles) == event_queue.end()) {
     std::list<std::tuple<Callable*, EventType, CallData*>> tmp;
     event_queue[Sys::boostedTick() + cycles] = tmp;
@@ -2043,6 +2055,38 @@ void Sys::try_register_event(
   }
   event_queue[Sys::boostedTick() + cycles].push_back(
       std::make_tuple(callable, event, callData));
+
+
+  // print info add by fanxi
+  //   std::cout << "------print event_queue_item -----" << std::endl;
+  //   for(auto event_queue_item =event_queue.begin();event_queue_item!=event_queue.end();event_queue_item++)
+  //   {
+  //         auto key_my= event_queue_item->first;
+  //         auto list_my= event_queue_item->second;  // list object
+
+  //         std::cout <<" size(list_my) " << list_my.size() <<  std::endl;  // =1
+  //        
+  //         std::cout << "@ tick "<< key_my  << std::endl;
+  //         
+  //         std::cout << "------print tuples in lists  -----" << std::endl;
+  //         
+  //         auto tuple_item = list_my.begin();  //Callable*, EventType, CallData*
+  //         std::cout << "tuple item0: "  << std::get<0>(*tuple_item) << std::endl;
+  //         std::cout << "tuple item2: "  << std::get<2>(*tuple_item) << std::endl;
+  //        
+
+  //         ++tuple_item;
+  //         while (tuple_item!=list_my.end())
+  //         {   
+  //             std::cout << "------print the second ?tuples in lists  -----" << std::endl;
+  //             std::cout << "tuple item0: "  << std::get<0>(*tuple_item) << std::endl;
+  //             std::cout << "tuple item2: "  << std::get<2>(*tuple_item) << std::endl;
+  //             ++tuple_item;  
+  //         }
+
+  //   }
+
+
   if (should_schedule) {
     timespec_t tmp = generate_time(cycles);
     BasicEventHandlerData* data =

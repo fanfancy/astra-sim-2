@@ -346,7 +346,7 @@ NetworkInterface::wakeup()
         }
     }
     if(fired==false && template_message_received==1){
-        std::cout<<"fired"<<std::endl;
+        std::cout<<"fired in NetworkInterface.cc"<<std::endl;
         fired=true;
         my_generator->workload->fire();
         return;
@@ -1137,6 +1137,7 @@ void NetworkInterface::sim_schedule(AstraSim::timespec_t delta, void (*fun_ptr)(
     return;
 }
 int NetworkInterface::sim_send(void *buffer, int count, int type, int dst, int tag, AstraSim::sim_request *request,void (*msg_handler)(void *fun_arg), void* fun_arg){
+    std::cout<<" add by fanxi : sim_send in garnet2.0 is called"<< std::endl;
     if(true) {
         //int flits=ceil(((double)m_net_ptr->get_package_packet_size()*8)/flit_width);
         //std::cout<<"send called from node: "<<m_id<<" , to node: "<<dst<<" , at vnet: "<<request->vnet<<" ,packet size: "<<m_net_ptr->get_package_packet_size()<<" , flits per packet: "<<flits<<std::endl;

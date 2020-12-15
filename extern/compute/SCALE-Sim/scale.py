@@ -128,11 +128,14 @@ class scale:
                     topology_file = self.topology_file,
                     offset_list = offset_list
                 )
+        print ("**************** run_net Complete  *******************")
         self.cleanup()
         print("************ SCALE SIM Run Complete ****************")
 
 
     def cleanup(self):
+        print ("**************** cleaning up *******************")
+        
         if not os.path.exists("./outputs/"):
             os.system("mkdir ./outputs")
 

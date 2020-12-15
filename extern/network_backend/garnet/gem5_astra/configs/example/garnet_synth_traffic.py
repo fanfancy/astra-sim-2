@@ -197,6 +197,7 @@ system.voltage_domain = VoltageDomain(voltage = options.sys_voltage)
 system.clk_domain = SrcClockDomain(clock = options.sys_clock,
                                    voltage_domain = system.voltage_domain)
 
+print("add by fanxi in garnet_synth_traffic.py: Ruby create_system ing")
 Ruby.create_system(options, False, system)
 
 # Create a seperate clock domain for Ruby

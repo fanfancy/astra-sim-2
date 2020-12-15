@@ -1,10 +1,10 @@
-num-npus: 8
-num-packages: 4
-package-rows: 2
+num-npus: 32
+num-packages: 16
+package-rows: 4
 topology: Torus3D
 local-rings: 2
-vertical-rings: 2
-horizontal-rings: 2
+vertical-rings: 4
+horizontal-rings: 4
 flit-width: 2048 
 local-packet-size: 4096 
 package-packet-size: 4096 

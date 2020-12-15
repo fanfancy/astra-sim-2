@@ -233,6 +233,7 @@ def create_system(options, full_system, system, piobus = None, dma_ports = [],
         raise
 
     # Create the network topology
+    print ("fanxi added in ruby.py: calling topology.makeTopology")
     topology.makeTopology(options, network, IntLinkClass, ExtLinkClass,
             RouterClass)
 

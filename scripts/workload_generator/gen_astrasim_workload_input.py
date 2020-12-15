@@ -5,13 +5,13 @@ import subprocess
 import configparser as cp
 
 # Common variables for all layers
-DatatypeSize            = 2
-NumberOfNPUs            = 8 # This represents the total number of NPUs in the whole system
-NumberOfPackages        = 1
+DatatypeSize            = 2   
+NumberOfNPUs            = 32    # This represents the total number of NPUs in the whole system
+NumberOfPackages        = 16
 NumberOfNPUsPerPackage  = 0
 Strides                 = 1
-FilterHeight            = 1
-NumberOfChannels        = 1
+FilterHeight            = 1     # fixed 
+NumberOfChannels        = 1     # fixed
 # End common variables for all layers
 
 # Region for constants
@@ -308,6 +308,10 @@ def runScaleSim(topology_file, folder_name):
     current_path = os.getcwd()
     full_path = os.path.join(os.getcwd(), Outputs, folder_name, FLAGS.run_name, topology_file)
     os.chdir(SCALESIM_PATH)
+    print ("SCALESIM_CONFIG",SCALESIM_CONFIG)
+    print ("full_path",full_path)
+    ##sys.exit()
+    
     process = subprocess.Popen(["python3", "scale.py", "-arch_config=" + SCALESIM_CONFIG, "-network="+full_path])
     process.wait()
     os.chdir(current_path)
@@ -360,7 +364,8 @@ def getScaleSimOutputInternal(fwd_pass, inp_grad, weight_grad, folder_name):
     return { ForwardPassCycles : fwd_pass_cycles, InputGradientCycles : inp_grad_cycles, WeightGradientCycles : weight_grad_cycles }
 
 def getLayerTopologyForDataParallelApproach(layer):
-    fwd_pass_item = TopologyItem(layer.name, int(layer.m / NumberOfNPUs), layer.k, FilterHeight, layer.k, NumberOfChannels, layer.n, Strides)
+    ##  init:                    name,          ifmap_height,            ifmap_width, filter_height, filter_width,  channels,           num_filters,    strides)
+    fwd_pass_item = TopologyItem(layer.name, int(layer.m / NumberOfNPUs), layer.k,      FilterHeight, layer.k,      NumberOfChannels,   layer.n,        Strides)
 
     inp_grad_item = TopologyItem(layer.name, int(layer.m / NumberOfNPUs), layer.n, FilterHeight, layer.n, NumberOfChannels, layer.k, Strides)
 
